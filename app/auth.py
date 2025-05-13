@@ -38,10 +38,10 @@ def login_user(username: str, password: str):
     r.setex(f"session:{session_token}", 3600, username)  # expires in 1 hour
 
     # Publish login event
-    r.publish("login-events", f"{username} logged in at {datetime.utcnow().isoformat()}")
+    r.publish("login-events", f"{username} logged in at {datetime.now().isoformat()}")
 
     # Log audit stream
-    r.xadd("audit:logins", {"user": username, "ts": datetime.utcnow().isoformat()})
+    r.xadd("audit:logins", {"user": username, "ts": datetime.now().isoformat()})
 
     return {"token": session_token}
 

@@ -47,3 +47,17 @@ redis-cli
 SUBSCRIBE login-events      # to watch login pub/sub in action
 KEYS *                      # to see sessions, audit logs, etc.
 ```
+
+## 🖼 Screenshots
+
+### 1. FastAPI Swagger UI
+![Swagger UI](screenshots/fastapi-swagger.png)
+
+### 2. K8s pods
+![K8s pods](screenshots/k8s-pods.png)
+
+### 3. Redis CLI (Pub/Sub + Keys)
+![Redis CLI](screenshots/redis-pub-sub.png)
+
+### 4. Audit Log API Output
+![Audit Log](screenshots/fastapi-audit-trail-api.png)
