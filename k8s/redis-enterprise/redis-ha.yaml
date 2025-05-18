@@ -1,0 +1,75 @@
+# 1) Headless Service for peer discovery
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-ha-headless
+  namespace: redis-enterprise
+spec:
+  clusterIP: None
+  selector:
+    app: redis-ha
+  ports:
+    - port: 6379
+      name: redis
+
+---
+# 2) StatefulSet with 2 replicas (0=master, 1=replica)
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-ha
+  namespace: redis-enterprise
+spec:
+  serviceName: redis-ha-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis-ha
+  template:
+    metadata:
+      labels:
+        app: redis-ha
+    spec:
+      containers:
+        - name: redis
+          image: redis/redis-stack:latest
+          args:
+            - "sh"
+            - "-c"
+            - |
+              if [ "$(hostname)" = "redis-ha-0" ]; then
+                echo "Starting primary with modules..."
+                exec redis-stack-server --appendonly yes
+              else
+                echo "Starting replica with modules..."
+                 exec redis-stack-server --appendonly yes --replicaof redis-ha-0.redis-ha-headless 6379
+              fi
+          ports:
+            - containerPort: 6379
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+---
+# 3) Service to talk to the master
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-ha-primary
+  namespace: redis-enterprise
+spec:
+  selector:
+    app: redis-ha
+    # match only the primary pod (ordinal 0)
+    statefulset.kubernetes.io/pod-name: redis-ha-0
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis

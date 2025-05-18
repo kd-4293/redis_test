@@ -1,23 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-app
+  name: redis-fastapi-app
+  namespace: redis-enterprise
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fastapi-app
+      app: redis-fastapi
   template:
     metadata:
       labels:
-        app: fastapi-app
+        app: redis-fastapi
     spec:
       containers:
-      - name: fastapi
-        image: fastapi-app:latest
+      - name: redis-fastapi
+        image: redis-fastapi-app:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 8000
-        env:
-        - name: REDIS_HOST
-          value: "redis"

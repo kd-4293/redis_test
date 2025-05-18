@@ -1,0 +1,13 @@
+apiVersion: redis.com/v1alpha1
+kind: RedisEnterpriseCluster
+metadata:
+  name: rec-cluster-1
+spec:
+  licenseSecret: redis-enterprise-license
+  nodes: 3
+  version: "7.0.0"
+  storageClassName: standard
+  resources:
+    requests:
+      cpu:    "500m"
+      memory: "1Gi"
